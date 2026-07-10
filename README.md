@@ -21,7 +21,7 @@ Administra clasificaciones internacionales de edad para juegos usando PEGI y ESR
 | Ruta base | `/api/v2/clasificaciones` |
 | HATEOAS | `/api/v2/hateoas/clasificaciones` |
 | Swagger local | `http://localhost:8093/doc/swagger-ui.html` |
-| Swagger Render | `https://NOMBRE-DEL-SERVICIO.onrender.com/doc/swagger-ui/index.html` |
+| Swagger Render | `https://ms-clasificacion-render.onrender.com/doc/swagger-ui.html` |
 | Eureka | Deshabilitado por defecto para Render |
 
 ## Endpoints principales
@@ -52,6 +52,30 @@ EUREKA_CLIENT_ENABLED=false
 Render entrega los datos de conexion al crear la base PostgreSQL. Usar el host,
 puerto, database, usuario y password de esa base para formar la URL JDBC.
 
+La base debe crearse en la misma region que el Web Service. Para este
+despliegue se utiliza PostgreSQL administrado por Render, no una base local ni
+un contenedor de base de datos dentro del proyecto.
+
+## Despliegue realizado en Render
+
+1. Crear una instancia PostgreSQL en Render en la misma region del servicio.
+2. Crear un Web Service desde este repositorio con entorno `Docker` y rama
+   `main`.
+3. Configurar las variables de entorno indicadas anteriormente. No es necesario
+   definir `PORT`: Render lo entrega automaticamente y Spring Boot lo utiliza.
+4. Render construye la imagen con el `Dockerfile`, inicia el servicio y Flyway
+   crea el esquema de base de datos.
+5. `DataInitializer` carga cinco clasificaciones PEGI y ESRB cuando la tabla se
+   encuentra vacia.
+
+URL de produccion:
+
+`https://ms-clasificacion-render.onrender.com/api/v2/clasificaciones`
+
+Swagger de produccion:
+
+`https://ms-clasificacion-render.onrender.com/doc/swagger-ui.html`
+
 ## Ejecucion local con PostgreSQL
 
 ```bash
@@ -81,4 +105,4 @@ docker run --rm -p 8093:8093 \
 
 - `GET /api/v2/clasificaciones`
 - `GET /api/v2/clasificaciones/permitidas?edad=16`
-- `GET /doc/swagger-ui/index.html`
+- `GET /doc/swagger-ui.html`
